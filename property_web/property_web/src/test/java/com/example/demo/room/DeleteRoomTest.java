@@ -1,16 +1,6 @@
 
    package com.example.demo.Room;
 
-   import com.example.demo.Model.Room;
-   import org.junit.jupiter.api.AfterEach;
-   import org.junit.jupiter.api.BeforeEach;
-   import org.junit.jupiter.api.Test;
-   import org.springframework.beans.factory.annotation.Autowired;
-   import org.springframework.boot.test.context.SpringBootTest;
-   import org.springframework.http.HttpStatus;
-   import org.springframework.http.ResponseEntity;
-   import org.springframework.test.context.ActiveProfiles;
-
    import java.sql.Connection;
    import java.sql.Date;
    import java.sql.DriverManager;
@@ -19,7 +9,23 @@
    import java.sql.SQLException;
    import java.util.Map;
 
-   import static org.junit.jupiter.api.Assertions.*;
+   import org.junit.jupiter.api.AfterEach;
+   import static org.junit.jupiter.api.Assertions.assertEquals;
+   import static org.junit.jupiter.api.Assertions.assertFalse;
+   import static org.junit.jupiter.api.Assertions.assertNotNull;
+   import static org.junit.jupiter.api.Assertions.assertTrue;
+   import static org.junit.jupiter.api.Assertions.fail;
+   import org.junit.jupiter.api.BeforeEach;
+   import org.junit.jupiter.api.Test;
+   import org.springframework.beans.factory.annotation.Autowired;
+   import org.springframework.boot.test.context.SpringBootTest;
+   import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.example.demo.Model.Room;
+@Transactional
 
    @SpringBootTest
    @ActiveProfiles("test")

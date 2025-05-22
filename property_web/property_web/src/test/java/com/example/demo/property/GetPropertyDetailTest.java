@@ -19,12 +19,14 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.ExtendedModelMap;
 import org.springframework.ui.Model;
 
 import com.example.demo.Model.Property;
 
 @SpringBootTest
+@Transactional
 @ActiveProfiles("test")
 public class GetPropertyDetailTest {
 

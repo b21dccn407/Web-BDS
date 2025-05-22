@@ -19,9 +19,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.example.demo.Model.Property;
-
+@Transactional
 @SpringBootTest
 @ActiveProfiles("test")
 public class GetPropertyType1UserListTest {
