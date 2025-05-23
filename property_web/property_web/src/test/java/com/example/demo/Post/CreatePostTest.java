@@ -38,11 +38,11 @@ public class CreatePostTest {
 
     @BeforeEach
     public void setUp() throws SQLException {
-        connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/bds", "root", "1234");
+        connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/web_nhadat", "root", "1234");
         connection.setAutoCommit(false);
 
         // Clear existing data
-        try (PreparedStatement ps = connection.prepareStatement("DELETE FROM bds.post WHERE id_property = ?")) {
+        try (PreparedStatement ps = connection.prepareStatement("DELETE FROM web_nhadat.post WHERE id_property = ?")) {
             ps.setInt(1, TEST_PROPERTY_ID);
             ps.executeUpdate();
         }
@@ -52,7 +52,7 @@ public class CreatePostTest {
 
     @AfterEach
     public void tearDown() throws SQLException {
-        try (PreparedStatement ps = connection.prepareStatement("DELETE FROM bds.post WHERE id_property = ?")) {
+        try (PreparedStatement ps = connection.prepareStatement("DELETE FROM web_nhadat.post WHERE id_property = ?")) {
             ps.setInt(1, TEST_PROPERTY_ID);
             ps.executeUpdate();
         }
@@ -112,7 +112,7 @@ public class CreatePostTest {
 
         // Verify data in database
         try (PreparedStatement ps = connection.prepareStatement(
-                "SELECT * FROM bds.post WHERE id_property = ? AND created_by_user = ?")) {
+                "SELECT * FROM web_nhadat.post WHERE id_property = ? AND created_by_user = ?")) {
             ps.setInt(1, TEST_PROPERTY_ID);
             ps.setInt(2, TEST_USER_ID);
             try (ResultSet rs = ps.executeQuery()) {
@@ -176,7 +176,7 @@ public class CreatePostTest {
 
         // Verify no data in database
         try (PreparedStatement ps = connection.prepareStatement(
-                "SELECT COUNT(*) FROM bds.post WHERE id_property = ?")) {
+                "SELECT COUNT(*) FROM web_nhadat.post WHERE id_property = ?")) {
             ps.setInt(1, TEST_PROPERTY_ID);
             try (ResultSet rs = ps.executeQuery()) {
                 assertTrue(rs.next(), "Result set should have data");
@@ -239,7 +239,7 @@ public class CreatePostTest {
 
         // Verify no data in database
         try (PreparedStatement ps = connection.prepareStatement(
-                "SELECT COUNT(*) FROM bds.post WHERE id_property = ?")) {
+                "SELECT COUNT(*) FROM web_nhadat.post WHERE id_property = ?")) {
             ps.setInt(1, TEST_PROPERTY_ID);
             try (ResultSet rs = ps.executeQuery()) {
                 assertTrue(rs.next(), "Result set should have data");

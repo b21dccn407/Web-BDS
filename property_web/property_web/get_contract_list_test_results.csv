@@ -1,0 +1,5 @@
+Mã testcase,Tên File / Folder,Tên hàm,M?c tiêu Testcase,D? li?u ??u vào,K?t qu? mong mu?n ??u ra,K?t qu? th?c t?,K?t qu?,Ghi chú
+CON_GET02,Contract/ContractController,getContractList,Ki?m tra l?y danh sách v?i prop_owner_id không t?n t?i,prop_owner_id="999",HTTP Status: 200 OK. Response: List<Contract> r?ng,,PASSED,
+CON_GET01,Contract/ContractController,getContractList,Ki?m tra l?y danh sách contract thành công v?i prop_owner_id h?p l?,prop_owner_id="9999",HTTP Status: 200 OK. Response: List<Contract> không r?ng, ch?a b?n ghi v?i prop_owner_id=9999,,PASSED,
+CON_GET03,Contract/ContractController,getContractList,Ki?m tra l?y danh sách v?i prop_owner_id không ph?i s?,prop_owner_id="abc",HTTP Status: 400 BAD_REQUEST. Response: Không tr? List<Contract>,,PASSED,
+CON_GET04,Contract/ContractController,getContractList,Ki?m tra l?y danh sách v?i prop_owner_id r?ng,prop_owner_id="",HTTP Status: 400 BAD_REQUEST. Response: Không tr? List<Contract>,,PASSED,

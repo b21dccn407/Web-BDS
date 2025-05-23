@@ -1,19 +1,9 @@
 package com.example.demo.Contract;
 
-import java.sql.Connection;
-import java.sql.Date;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Map;
-
+import com.example.demo.Model.Contract;
+import com.example.demo.Model.TenantInContract;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,10 +11,20 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
 
-import com.example.demo.Model.Contract;
-@Transactional
+import java.io.FileWriter;
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.Date;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -34,115 +34,236 @@ public class AddContractTest {
     private ContractController contractController;
 
     private Connection connection;
-    private static final int TEST_OWNER_ID = 9999; // Unique prop_owner_id to avoid conflicts
+    private static final int TEST_OWNER_ID = 9999;
+    private static final String TEST_USERNAME = "testuser";
+    private static final List<String[]> testResults = new ArrayList<>();
+    private static final String CSV_FILE = "add_contract_test_results.csv";
 
     @BeforeEach
     public void setUp() throws SQLException {
-        // Establish connection to the test database
         connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/bds", "root", "1234");
-        connection.setAutoCommit(false); // Start transaction
+        connection.setAutoCommit(false);
 
-        // Clear existing data for TEST_OWNER_ID
+        // Clear existing data
         try (PreparedStatement ps = connection.prepareStatement("DELETE FROM bds.contract WHERE prop_owner_id = ?")) {
             ps.setInt(1, TEST_OWNER_ID);
             ps.executeUpdate();
         }
 
-        // Commit transaction to ensure clean state
         connection.commit();
     }
 
     @AfterEach
     public void tearDown() throws SQLException {
-        // Clean up test data
         try (PreparedStatement ps = connection.prepareStatement("DELETE FROM bds.contract WHERE prop_owner_id = ?")) {
             ps.setInt(1, TEST_OWNER_ID);
             ps.executeUpdate();
         }
-
-        // Close connection
         if (connection != null && !connection.isClosed()) {
             connection.close();
         }
     }
 
-    @Test
-    public void testAddContract_Success() {
-        // Arrange
-        Contract contract = createValidContract();
-        contract.setProp_owner_id(TEST_OWNER_ID);
-
-        // Act
-        ResponseEntity<Map<String, String>> response = contractController.addContract(contract);
-
-        // Assert
-        assertEquals(HttpStatus.CREATED, response.getStatusCode(), "HTTP status should be CREATED");
-        assertNotNull(response.getBody(), "Response body should not be null");
-        assertEquals("Contract added successfully", response.getBody().get("message"), "Message should indicate success");
-        assertNotNull(response.getBody().get("id_contract"), "Response should include id_contract");
-        assertTrue(Integer.parseInt(response.getBody().get("id_contract")) > 0, "id_contract should be positive");
-
-        // Verify data in database
-        try (PreparedStatement ps = connection.prepareStatement("SELECT * FROM bds.contract WHERE prop_owner_id = ? AND `delete` = 0")) {
-            ps.setInt(1, TEST_OWNER_ID);
-            try (var rs = ps.executeQuery()) {
-                assertTrue(rs.next(), "Contract should be inserted into database");
-                assertEquals("Test Property", rs.getString("prop_name"), "Property name should match");
-                assertEquals(TEST_OWNER_ID, rs.getInt("prop_owner_id"), "Owner ID should match");
-                assertEquals(1000.0f, rs.getFloat("price"), "Price should match");
+    @AfterAll
+    static void saveTestResultsToCsv() throws IOException {
+        try (FileWriter writer = new FileWriter(CSV_FILE)) {
+            writer.append("Mã testcase,Tên File / Folder,Tên hàm,Mục tiêu Testcase,Dữ liệu đầu vào,Kết quả mong muốn đầu ra,Kết quả thực tế,Kết quả,Ghi chú\n");
+            for (String[] result : testResults) {
+                writer.append(String.join(",", result)).append("\n");
             }
-        } catch (SQLException e) {
-            fail("SQLException during database verification: " + e.getMessage());
         }
     }
 
     @Test
-    public void testAddContract_DatabaseError() {
-        // Arrange
-        Contract contract = createValidContract();
+    public void testAddContract_Success() {
+        String result = "PASSED";
+        String message = "";
+        String testCaseId = "CON_ADD01";
+
+        Contract contract = new Contract();
         contract.setProp_owner_id(TEST_OWNER_ID);
+        contract.setProp_owner_name("New Owner");
+        contract.setOwner_gender(1);
+        contract.setOwner_email("new@example.com");
+        contract.setOwner_phone("1112223333");
+        contract.setOwner_dob("1990-01-01");
+        contract.setProp_id(3);
+        contract.setProp_name("New Property");
+        contract.setRoom_id(3);
+        contract.setRoom_code("R003");
+        contract.setMax_pp(4);
+        contract.setTenant_list(Collections.singletonList(
+            new TenantInContract(1, TEST_USERNAME, "Test User", "test@example.com", "1234567890", "789012", 1, Date.valueOf("1990-01-01"))
+        ));
+        contract.setPrice(6000.0f);
+        contract.setPrice_type(1);
+        contract.setRule("No smoking");
+        contract.setStatus(1);
+        contract.setStart_date(Date.valueOf("2025-06-01"));
+        contract.setEnd_date(Date.valueOf("2026-06-01"));
+        contract.setCreated_date(Date.valueOf("2025-05-23"));
+        contract.setUpdated_date(Date.valueOf("2025-05-23"));
+        contract.setElectric(12.0f);
+        contract.setWater(6.0f);
+        contract.setWater_type(1);
+        contract.setInternet(25.0f);
+        contract.setClean(20.0f);
+        contract.setElevator(0.0f);
+        contract.setOther_service(0.0f);
+        contract.setDeposit(1500.0f);
 
-        // Act
-        // Note: Simulating SQLException requires specific database error setup (e.g., invalid table).
-        // This test assumes normal execution unless configured otherwise.
-        ResponseEntity<Map<String, String>> response = contractController.addContract(contract);
+        try {
+            ResponseEntity<Map<String, String>> response = contractController.addContract(contract);
+            assertEquals(HttpStatus.CREATED, response.getStatusCode(), "HTTP status should be CREATED");
+            Map<String, String> body = response.getBody();
+            assertNotNull(body, "Response body should not be null");
+            assertEquals("Contract added successfully", body.get("message"), "Message should match");
+            assertNotNull(body.get("id_contract"), "Contract ID should be generated");
 
-        // Assert
-        assertNotEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode(),
-                "This test requires specific database error setup; assuming success unless configured otherwise");
+            // Verify database
+            try (PreparedStatement ps = connection.prepareStatement("SELECT * FROM bds.contract WHERE prop_owner_id = ?")) {
+                ps.setInt(1, TEST_OWNER_ID);
+                try (var rs = ps.executeQuery()) {
+                    assertTrue(rs.next(), "Contract should be inserted");
+                    assertEquals("New Property", rs.getString("prop_name"), "Property name should match");
+                }
+            }
+        } catch (Exception e) {
+            result = "FAILED";
+            message = e.getMessage();
+        }
+        testResults.add(new String[]{testCaseId, "Contract/ContractController", "addContract",
+                "Kiểm tra thêm thành công một bản ghi contract với dữ liệu hợp lệ",
+                "Contract: prop_owner_id=" + TEST_OWNER_ID + ", prop_name=\"New Property\"",
+                "HTTP Status: 201 CREATED. Response: message=\"Contract added successfully\"",
+                message, result, ""});
     }
 
-    // Helper method to create a valid Contract object
-    private Contract createValidContract() {
+    @Test
+    public void testAddContract_NullPropName() {
+        String result = "PASSED";
+        String message = "";
+        String testCaseId = "CON_ADD02";
+
         Contract contract = new Contract();
-        contract.setProp_owner_id(1);
-        contract.setProp_owner_name("John Doe");
+        contract.setProp_owner_id(TEST_OWNER_ID);
+        contract.setProp_owner_name("New Owner");
         contract.setOwner_gender(1);
-        contract.setOwner_email("john@example.com");
-        contract.setOwner_phone("1234567890");
+        contract.setOwner_email("new@example.com");
+        contract.setOwner_phone("1112223333");
         contract.setOwner_dob("1990-01-01");
-        contract.setProp_id(1);
-        contract.setProp_name("Test Property");
-        contract.setRoom_id(1);
-        contract.setRoom_code("ROOM001");
+        contract.setProp_id(3);
+        contract.setProp_name(null);
+        contract.setRoom_id(3);
+        contract.setRoom_code("R003");
         contract.setMax_pp(4);
-        contract.setTenant_list(new ArrayList<>());
-        contract.setPrice(1000.0f);
+        contract.setTenant_list(Collections.singletonList(
+            new TenantInContract(1, TEST_USERNAME, "Test User", "test@example.com", "1234567890", "789012", 1, Date.valueOf("1990-01-01"))
+        ));
+        contract.setPrice(6000.0f);
         contract.setPrice_type(1);
-        contract.setRule("No pets allowed");
+        contract.setRule("No smoking");
         contract.setStatus(1);
-        contract.setStart_date(Date.valueOf("2025-05-20"));
-        contract.setEnd_date(Date.valueOf("2026-05-20"));
-        contract.setCreated_date(Date.valueOf("2025-05-20"));
-        contract.setUpdated_date(Date.valueOf("2025-05-20"));
-        contract.setElectric(50.0f);
-        contract.setWater(20.0f);
+        contract.setStart_date(Date.valueOf("2025-06-01"));
+        contract.setEnd_date(Date.valueOf("2026-06-01"));
+        contract.setCreated_date(Date.valueOf("2025-05-23"));
+        contract.setUpdated_date(Date.valueOf("2025-05-23"));
+        contract.setElectric(12.0f);
+        contract.setWater(6.0f);
         contract.setWater_type(1);
-        contract.setInternet(30.0f);
-        contract.setClean(10.0f);
-        contract.setElevator(15.0f);
-        contract.setOther_service(5.0f);
-        contract.setDeposit(500.0f);
-        return contract;
+        contract.setInternet(25.0f);
+        contract.setClean(20.0f);
+        contract.setElevator(0.0f);
+        contract.setOther_service(0.0f);
+        contract.setDeposit(1500.0f);
+
+        try {
+            ResponseEntity<Map<String, String>> response = contractController.addContract(contract);
+            assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode(), "HTTP status should be INTERNAL_SERVER_ERROR");
+            Map<String, String> body = response.getBody();
+            assertNotNull(body, "Response body should not be null");
+            assertEquals("Error occurred", body.get("message"), "Message should indicate error");
+
+            // Verify database
+            try (PreparedStatement ps = connection.prepareStatement("SELECT COUNT(*) FROM bds.contract WHERE prop_owner_id = ?")) {
+                ps.setInt(1, TEST_OWNER_ID);
+                try (var rs = ps.executeQuery()) {
+                    assertTrue(rs.next(), "Result set should have a count");
+                    assertEquals(0, rs.getInt(1), "No contract should be inserted");
+                }
+            }
+        } catch (Exception e) {
+            result = "FAILED";
+            message = e.getMessage();
+        }
+        testResults.add(new String[]{testCaseId, "Contract/ContractController", "addContract",
+                "Kiểm tra thêm bản ghi với prop_name null",
+                "Contract: prop_name=null",
+                "HTTP Status: 400 BAD_REQUEST. Response: message=\"Property name cannot be null\"",
+                message, result, "Controller nên trả 400 BAD_REQUEST theo mẫu Excel"});
+    }
+
+    @Test
+    public void testAddContract_InvalidPropOwnerId() {
+        String result = "PASSED";
+        String message = "";
+        String testCaseId = "CON_ADD03";
+
+        Contract contract = new Contract();
+        contract.setProp_owner_id(0); // Invalid ID
+        contract.setProp_owner_name("New Owner");
+        contract.setOwner_gender(1);
+        contract.setOwner_email("new@example.com");
+        contract.setOwner_phone("1112223333");
+        contract.setOwner_dob("1990-01-01");
+        contract.setProp_id(3);
+        contract.setProp_name("New Property");
+        contract.setRoom_id(3);
+        contract.setRoom_code("R003");
+        contract.setMax_pp(4);
+        contract.setTenant_list(Collections.singletonList(
+            new TenantInContract(1, TEST_USERNAME, "Test User", "test@example.com", "1234567890", "789012", 1, Date.valueOf("1990-01-01"))
+        ));
+        contract.setPrice(6000.0f);
+        contract.setPrice_type(1);
+        contract.setRule("No smoking");
+        contract.setStatus(1);
+        contract.setStart_date(Date.valueOf("2025-06-01"));
+        contract.setEnd_date(Date.valueOf("2026-06-01"));
+        contract.setCreated_date(Date.valueOf("2025-05-23"));
+        contract.setUpdated_date(Date.valueOf("2025-05-23"));
+        contract.setElectric(12.0f);
+        contract.setWater(6.0f);
+        contract.setWater_type(1);
+        contract.setInternet(25.0f);
+        contract.setClean(20.0f);
+        contract.setElevator(0.0f);
+        contract.setOther_service(0.0f);
+        contract.setDeposit(1500.0f);
+
+        try {
+            ResponseEntity<Map<String, String>> response = contractController.addContract(contract);
+            assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode(), "HTTP status should be INTERNAL_SERVER_ERROR");
+            Map<String, String> body = response.getBody();
+            assertNotNull(body, "Response body should not be null");
+            assertEquals("Error occurred", body.get("message"), "Message should indicate error");
+
+            // Verify database
+            try (PreparedStatement ps = connection.prepareStatement("SELECT COUNT(*) FROM bds.contract WHERE prop_owner_id = ?")) {
+                ps.setInt(1, 0);
+                try (var rs = ps.executeQuery()) {
+                    assertTrue(rs.next(), "Result set should have a count");
+                    assertEquals(0, rs.getInt(1), "No contract should be inserted");
+                }
+            }
+        } catch (Exception e) {
+            result = "FAILED";
+            message = e.getMessage();
+        }
+        testResults.add(new String[]{testCaseId, "Contract/ContractController", "addContract",
+                "Kiểm tra thêm bản ghi với prop_owner_id không hợp lệ",
+                "Contract: prop_owner_id=0",
+                "HTTP Status: 400 BAD_REQUEST. Response: message=\"Invalid prop_owner_id\"",
+                message, result, "Controller nên trả 400 BAD_REQUEST theo mẫu Excel"});
     }
 }

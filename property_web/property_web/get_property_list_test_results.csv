@@ -1,0 +1,2 @@
+Mã testcase,Tên File / Folder,Tên hàm,M?c tiêu Testcase,D? li?u ??u vào,K?t qu? mong mu?n ??u ra,K?t qu? th?c t?,K?t qu?,Ghi chú
+PROP_GET01,Property/PropertyController,getPropertyList,Ki?m tra l?y danh sách property thành công,Database: Có b?n ghi v?i delete = 0,HTTP Status: 200 OK. Response: List<Property> không r?ng, ch?a b?n ghi v?i delete = 0,,PASSED,

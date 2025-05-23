@@ -1,0 +1,2 @@
+Mã testcase,Tên File / Folder,Tên hàm,M?c tiêu Testcase,D? li?u ??u vào,K?t qu? mong mu?n ??u ra,K?t qu? th?c t?,K?t qu?,Ghi chú
+PROP_UPD02,Property/PropertyController,updateProperty,Ki?m tra c?p nh?t property v?i name null,id_property=133, Property: name=null,HTTP Status: 400 BAD_REQUEST. Response: message="Name must not be null or empty",,PASSED,

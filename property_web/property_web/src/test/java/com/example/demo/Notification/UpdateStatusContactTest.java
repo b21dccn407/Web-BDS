@@ -39,11 +39,11 @@ public class UpdateStatusContactTest {
     @BeforeEach
     public void setUp() throws SQLException {
         // Establish connection to the test database
-        connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/bds", "root", "1234");
+        connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/web_nhadat", "root", "1234");
         connection.setAutoCommit(false); // Start transaction
 
         // Clear existing data for TEST_NOTIFICATION_ID
-        try (PreparedStatement ps = connection.prepareStatement("DELETE FROM bds.notification WHERE id_notification = ? OR id_owner = ?")) {
+        try (PreparedStatement ps = connection.prepareStatement("DELETE FROM web_nhadat.notification WHERE id_notification = ? OR id_owner = ?")) {
             ps.setInt(1, TEST_NOTIFICATION_ID);
             ps.setInt(2, TEST_OWNER_ID);
             ps.executeUpdate();
@@ -54,7 +54,7 @@ public class UpdateStatusContactTest {
     @AfterEach
     public void tearDown() throws SQLException {
         // Clean up test data
-        try (PreparedStatement ps = connection.prepareStatement("DELETE FROM bds.notification WHERE id_notification = ? OR id_owner = ?")) {
+        try (PreparedStatement ps = connection.prepareStatement("DELETE FROM web_nhadat.notification WHERE id_notification = ? OR id_owner = ?")) {
             ps.setInt(1, TEST_NOTIFICATION_ID);
             ps.setInt(2, TEST_OWNER_ID);
             ps.executeUpdate();
@@ -90,7 +90,7 @@ public class UpdateStatusContactTest {
         assertEquals("Update noti status successfully!", response.getBody().get("message"), "Message should indicate success");
 
         // Verify data in database
-        try (PreparedStatement ps = connection.prepareStatement("SELECT status FROM bds.notification WHERE id_notification = ?")) {
+        try (PreparedStatement ps = connection.prepareStatement("SELECT status FROM web_nhadat.notification WHERE id_notification = ?")) {
             ps.setInt(1, TEST_NOTIFICATION_ID);
             try (ResultSet rs = ps.executeQuery()) {
                 assertTrue(rs.next(), "Notification should exist in database");
@@ -114,7 +114,7 @@ public class UpdateStatusContactTest {
         assertEquals("Update noti status successfully!", response.getBody().get("message"), "Message should indicate success");
 
         // Verify data in database
-        try (PreparedStatement ps = connection.prepareStatement("SELECT COUNT(*) FROM bds.notification WHERE id_notification = ?")) {
+        try (PreparedStatement ps = connection.prepareStatement("SELECT COUNT(*) FROM web_nhadat.notification WHERE id_notification = ?")) {
             ps.setInt(1, TEST_NOTIFICATION_ID);
             try (ResultSet rs = ps.executeQuery()) {
                 rs.next();
@@ -142,7 +142,7 @@ public class UpdateStatusContactTest {
     // Helper method to insert a test notification
     private void insertTestNotification(int notificationId, int ownerId) throws SQLException {
         String tenantsJson = "[{\"username\": \"test_user\"}]";
-        String insertQuery = "INSERT INTO bds.notification (id_notification, label, content, path, id_owner, tenants, status, created_date, `delete`) " +
+        String insertQuery = "INSERT INTO web_nhadat.notification (id_notification, label, content, path, id_owner, tenants, status, created_date, `delete`) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0)";
         try (PreparedStatement ps = connection.prepareStatement(insertQuery)) {
             ps.setInt(1, notificationId);

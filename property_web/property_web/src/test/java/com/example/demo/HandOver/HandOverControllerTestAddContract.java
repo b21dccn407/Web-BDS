@@ -44,11 +44,11 @@ public class HandOverControllerTestAddContract {
      */
     @BeforeEach
     public void setUp() throws SQLException {
-        connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/bds", "root", "1234");
+        connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/web_nhadat", "root", "1234");
         connection.setAutoCommit(false);
 
         // Xóa dữ liệu cũ
-        try (PreparedStatement ps = connection.prepareStatement("DELETE FROM bds.hand_over WHERE id_owner = ?")) {
+        try (PreparedStatement ps = connection.prepareStatement("DELETE FROM web_nhadat.hand_over WHERE id_owner = ?")) {
             ps.setInt(1, TEST_OWNER_ID);
             ps.executeUpdate();
         }
@@ -60,7 +60,7 @@ public class HandOverControllerTestAddContract {
      */
     @AfterEach
     public void tearDown() throws SQLException {
-        try (PreparedStatement ps = connection.prepareStatement("DELETE FROM bds.hand_over WHERE id_owner = ?")) {
+        try (PreparedStatement ps = connection.prepareStatement("DELETE FROM web_nhadat.hand_over WHERE id_owner = ?")) {
             ps.setInt(1, TEST_OWNER_ID);
             ps.executeUpdate();
         }
@@ -103,7 +103,7 @@ public class HandOverControllerTestAddContract {
         assertTrue(Integer.parseInt(newId) > 0);
 
         // Kiểm tra cơ sở dữ liệu
-        try (PreparedStatement ps = connection.prepareStatement("SELECT * FROM bds.hand_over WHERE id_hand_over = ?")) {
+        try (PreparedStatement ps = connection.prepareStatement("SELECT * FROM web_nhadat.hand_over WHERE id_hand_over = ?")) {
             ps.setInt(1, Integer.parseInt(newId));
             try (ResultSet rs = ps.executeQuery()) {
                 assertTrue(rs.next());

@@ -42,29 +42,29 @@ import com.example.demo.Model.Room;
 
        @BeforeEach
        public void setUp() throws SQLException {
-           connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/bds", "root", "1234");
+           connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/web_nhadat", "root", "1234");
            connection.setAutoCommit(false);
 
            // Clear all data from invoice
-           try (PreparedStatement ps = connection.prepareStatement("DELETE FROM bds.invoice WHERE status = 1")) {
+           try (PreparedStatement ps = connection.prepareStatement("DELETE FROM web_nhadat.invoice WHERE status = 1")) {
                ps.executeUpdate();
            } catch (SQLException e) {
                // Ignore if table doesn't exist
            }
 
            // Clear all data from room (including delete = 1)
-           try (PreparedStatement ps = connection.prepareStatement("DELETE FROM bds.room")) {
+           try (PreparedStatement ps = connection.prepareStatement("DELETE FROM web_nhadat.room")) {
                ps.executeUpdate();
            }
 
            // Clear all data with id_property = 10022 from property
-           try (PreparedStatement ps = connection.prepareStatement("DELETE FROM bds.property WHERE id_property = ?")) {
+           try (PreparedStatement ps = connection.prepareStatement("DELETE FROM web_nhadat.property WHERE id_property = ?")) {
                ps.setInt(1, TEST_PROPERTY_ID);
                ps.executeUpdate();
            }
 
            // Insert test property
-           String insertPropertyQuery = "INSERT INTO bds.property (id_property, name, province, district, ward, detail_address, " +
+           String insertPropertyQuery = "INSERT INTO web_nhadat.property (id_property, name, province, district, ward, detail_address, " +
                    "legal_doc, surface_area, useable_area, width, length, flours, bedrooms, toilet, direction, price, price_type, " +
                    "status, note, id_user, created_at, updated_at, `delete`, created_by_staff, created_by_user, type) " +
                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
@@ -101,7 +101,7 @@ import com.example.demo.Model.Room;
            }
 
            // Insert test room
-           String insertRoomQuery = "INSERT INTO bds.room (id_room, name, id_property, `delete`, status, price, id_owner, area, bathroom, bedroom, kitchen, interior, balcony, max_people, created_at, updated_at, frequency) " +
+           String insertRoomQuery = "INSERT INTO web_nhadat.room (id_room, name, id_property, `delete`, status, price, id_owner, area, bathroom, bedroom, kitchen, interior, balcony, max_people, created_at, updated_at, frequency) " +
                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
            try (PreparedStatement ps = connection.prepareStatement(insertRoomQuery)) {
                ps.setInt(1, TEST_ROOM_ID);
@@ -153,7 +153,7 @@ import com.example.demo.Model.Room;
            assertEquals("Delete successfully!", responseBody.get("message"), "Message should match");
 
            // Verify room is deleted
-           try (PreparedStatement ps = connection.prepareStatement("SELECT id_room FROM bds.room WHERE id_room = ? AND `delete` = 0")) {
+           try (PreparedStatement ps = connection.prepareStatement("SELECT id_room FROM web_nhadat.room WHERE id_room = ? AND `delete` = 0")) {
                ps.setInt(1, TEST_ROOM_ID);
                try (ResultSet rs = ps.executeQuery()) {
                    assertFalse(rs.next(), "Room should not exist with delete = 0");
@@ -200,7 +200,7 @@ import com.example.demo.Model.Room;
        @Test
        public void testDeleteRoom_HasActiveInvoice() throws SQLException {
            // Arrange: Insert invoice
-           String insertInvoiceQuery = "INSERT INTO bds.invoice (id_invoice, id_room, status) VALUES (?, ?, ?)";
+           String insertInvoiceQuery = "INSERT INTO web_nhadat.invoice (id_invoice, id_room, status) VALUES (?, ?, ?)";
            try (PreparedStatement ps = connection.prepareStatement(insertInvoiceQuery)) {
                ps.setInt(1, TEST_INVOICE_ID);
                ps.setInt(2, TEST_ROOM_ID);
@@ -224,7 +224,7 @@ import com.example.demo.Model.Room;
            assertEquals("Không thể xóa phòng, vẫn còn hợp đồng còn thời hạn", responseBody.get("message"), "Message should match");
 
            // Verify room is not deleted
-           try (PreparedStatement ps = connection.prepareStatement("SELECT id_room FROM bds.room WHERE id_room = ? AND `delete` = 0")) {
+           try (PreparedStatement ps = connection.prepareStatement("SELECT id_room FROM web_nhadat.room WHERE id_room = ? AND `delete` = 0")) {
                ps.setInt(1, TEST_ROOM_ID);
                try (ResultSet rs = ps.executeQuery()) {
                    assertTrue(rs.next(), "Room should still exist with delete = 0");

@@ -38,22 +38,22 @@ public class AddRoomTest {
 
     @BeforeEach
     public void setUp() throws SQLException {
-        connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/bds", "root", "1234");
+        connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/web_nhadat", "root", "1234");
         connection.setAutoCommit(false);
 
         // Clear all data with delete = 0 from room
-        try (PreparedStatement ps = connection.prepareStatement("DELETE FROM bds.room WHERE `delete` = 0")) {
+        try (PreparedStatement ps = connection.prepareStatement("DELETE FROM web_nhadat.room WHERE `delete` = 0")) {
             ps.executeUpdate();
         }
 
         // Clear all data with id_property = 10022 from property
-        try (PreparedStatement ps = connection.prepareStatement("DELETE FROM bds.property WHERE id_property = ?")) {
+        try (PreparedStatement ps = connection.prepareStatement("DELETE FROM web_nhadat.property WHERE id_property = ?")) {
             ps.setInt(1, TEST_PROPERTY_ID);
             ps.executeUpdate();
         }
 
         // Insert test property
-        String insertPropertyQuery = "INSERT INTO bds.property (id_property, name, province, district, ward, detail_address, " +
+        String insertPropertyQuery = "INSERT INTO web_nhadat.property (id_property, name, province, district, ward, detail_address, " +
                 "legal_doc, surface_area, useable_area, width, length, flours, bedrooms, toilet, direction, price, price_type, " +
                 "status, note, id_user, created_at, updated_at, `delete`, created_by_staff, created_by_user, type) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
@@ -129,7 +129,7 @@ public class AddRoomTest {
         assertEquals("Room added successfully", responseBody.get("message"), "Message should match");
 
         // Verify inserted data
-        try (PreparedStatement ps = connection.prepareStatement("SELECT name, id_property, id_owner, price FROM bds.room WHERE id_property = ? AND `delete` = 0")) {
+        try (PreparedStatement ps = connection.prepareStatement("SELECT name, id_property, id_owner, price FROM web_nhadat.room WHERE id_property = ? AND `delete` = 0")) {
             ps.setInt(1, TEST_PROPERTY_ID);
             try (ResultSet rs = ps.executeQuery()) {
                 assertTrue(rs.next(), "Room should exist");

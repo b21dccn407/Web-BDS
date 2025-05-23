@@ -1,0 +1,4 @@
+Mã testcase,Tên File / Folder,Tên hàm,M?c tiêu Testcase,D? li?u ??u vào,K?t qu? mong mu?n ??u ra,K?t qu? th?c t?,K?t qu?,Ghi chú
+PROP_ADD02,Property/PropertyController,addProperty,Ki?m tra thêm property v?i name null,Property: name=null,HTTP Status: 400 BAD_REQUEST. Response: message="Name must not be null or empty",,PASSED,
+PROP_ADD03,Property/PropertyController,addProperty,Ki?m tra thêm property v?i name r?ng,Property: name="",HTTP Status: 400 BAD_REQUEST. Response: message="Name must not be null or empty",,PASSED,
+PROP_ADD01,Property/PropertyController,addProperty,Ki?m tra thêm property thành công v?i d? li?u h?p l?,Property: name="New Property", id_user=9999,HTTP Status: 201 CREATED. Response: message="Property added successfully",,PASSED,

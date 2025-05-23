@@ -1,0 +1,2 @@
+Mã testcase,Tên File / Folder,Tên hàm,M?c tiêu Testcase,D? li?u ??u vào,K?t qu? mong mu?n ??u ra,K?t qu? th?c t?,K?t qu?,Ghi chú
+CON_UPD02,Contract/ContractController,updateContract,Ki?m tra c?p nh?t v?i prop_name null,id_contract=140, Contract: prop_name=null,HTTP Status: 400 BAD_REQUEST. Response: message="Property name must not be null or empty",,PASSED,

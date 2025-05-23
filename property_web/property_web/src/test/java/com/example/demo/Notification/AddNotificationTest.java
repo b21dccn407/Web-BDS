@@ -42,11 +42,11 @@ public class AddNotificationTest {
     @BeforeEach
     public void setUp() throws SQLException {
         // Establish connection to the test database
-        connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/bds", "root", "1234");
+        connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/web_nhadat", "root", "1234");
         connection.setAutoCommit(false); // Start transaction
 
         // Clear existing data for TEST_NOTIFICATION_ID
-        try (PreparedStatement ps = connection.prepareStatement("DELETE FROM bds.notification WHERE id_notification = ? OR id_owner = ?")) {
+        try (PreparedStatement ps = connection.prepareStatement("DELETE FROM web_nhadat.notification WHERE id_notification = ? OR id_owner = ?")) {
             ps.setInt(1, TEST_NOTIFICATION_ID);
             ps.setInt(2, TEST_OWNER_ID);
             ps.executeUpdate();
@@ -57,7 +57,7 @@ public class AddNotificationTest {
     @AfterEach
     public void tearDown() throws SQLException {
         // Clean up test data
-        try (PreparedStatement ps = connection.prepareStatement("DELETE FROM bds.notification WHERE id_notification = ? OR id_owner = ?")) {
+        try (PreparedStatement ps = connection.prepareStatement("DELETE FROM web_nhadat.notification WHERE id_notification = ? OR id_owner = ?")) {
             ps.setInt(1, TEST_NOTIFICATION_ID);
             ps.setInt(2, TEST_OWNER_ID);
             ps.executeUpdate();
@@ -92,7 +92,7 @@ public class AddNotificationTest {
         assertEquals("Noti added successfully", response.getBody().get("message"), "Message should indicate success");
 
         // Verify data in database
-        try (PreparedStatement ps = connection.prepareStatement("SELECT * FROM bds.notification WHERE id_owner = ?")) {
+        try (PreparedStatement ps = connection.prepareStatement("SELECT * FROM web_nhadat.notification WHERE id_owner = ?")) {
             ps.setInt(1, TEST_OWNER_ID);
             try (ResultSet rs = ps.executeQuery()) {
                 assertTrue(rs.next(), "Notification should exist in database");
@@ -120,7 +120,7 @@ public class AddNotificationTest {
         assertEquals("Noti added successfully", response.getBody().get("message"), "Message should indicate success");
 
         // Verify data in database
-        try (PreparedStatement ps = connection.prepareStatement("SELECT * FROM bds.notification WHERE id_owner = ?")) {
+        try (PreparedStatement ps = connection.prepareStatement("SELECT * FROM web_nhadat.notification WHERE id_owner = ?")) {
             ps.setInt(1, TEST_OWNER_ID);
             try (ResultSet rs = ps.executeQuery()) {
                 assertTrue(rs.next(), "Notification should exist in database");

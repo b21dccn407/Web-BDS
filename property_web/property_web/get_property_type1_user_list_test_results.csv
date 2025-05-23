@@ -1,0 +1,5 @@
+Mã testcase,Tên File / Folder,Tên hàm,M?c tiêu Testcase,D? li?u ??u vào,K?t qu? mong mu?n ??u ra,K?t qu? th?c t?,K?t qu?,Ghi chú
+PROP_TYPE1_GET04,Property/PropertyController,getPropertyType1UserList,Ki?m tra l?y danh sách v?i id_user r?ng,id_user="",HTTP Status: 400 BAD_REQUEST. Response: List<Property> r?ng,,PASSED,
+PROP_TYPE1_GET03,Property/PropertyController,getPropertyType1UserList,Ki?m tra l?y danh sách v?i id_user không ph?i s?,id_user="abc",HTTP Status: 400 BAD_REQUEST. Response: List<Property> r?ng,,PASSED,
+PROP_TYPE1_GET02,Property/PropertyController,getPropertyType1UserList,Ki?m tra l?y danh sách v?i id_user không t?n t?i,id_user=999,HTTP Status: 200 OK. Response: List<Property> r?ng,,PASSED,
+PROP_TYPE1_GET01,Property/PropertyController,getPropertyType1UserList,Ki?m tra l?y danh sách property type=1 thành công v?i id_user h?p l?,id_user=9999,HTTP Status: 200 OK. Response: List<Property> không r?ng, ch?a b?n ghi v?i type=1, id_user=9999,,PASSED,

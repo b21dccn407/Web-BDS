@@ -1,0 +1,5 @@
+Mã testcase,Tên File / Folder,Tên hàm,M?c tiêu Testcase,D? li?u ??u vào,K?t qu? mong mu?n ??u ra,K?t qu? th?c t?,K?t qu?,Ghi chú
+CON_DET_GET01,Contract/ContractController,getContractDetail,Ki?m tra l?y chi ti?t contract thành công v?i id_contract h?p l?,id_contract=121,HTTP Status: 200 OK. Response: Contract v?i id_contract=121, prop_name không null,,PASSED,
+CON_DET_GET02,Contract/ContractController,getContractDetail,Ki?m tra l?y chi ti?t v?i id_contract không t?n t?i,id_contract=999,HTTP Status: 400 BAD_REQUEST. Response: message="Contract not found",,PASSED,Controller nên tr? 400 BAD_REQUEST theo m?u Excel
+CON_DET_GET03,Contract/ContractController,getContractDetail,Ki?m tra l?y chi ti?t v?i id_contract không ph?i s?,id_contract="abc",HTTP Status: 400 BAD_REQUEST. Response: message="Invalid id_contract",,PASSED,Controller nên tr? 400 BAD_REQUEST theo m?u Excel
+CON_DET_GET04,Contract/ContractController,getContractDetail,Ki?m tra l?y chi ti?t v?i id_contract r?ng,id_contract="",HTTP Status: 400 BAD_REQUEST. Response: message="Invalid id_contract",,PASSED,Controller nên tr? 400 BAD_REQUEST theo m?u Excel

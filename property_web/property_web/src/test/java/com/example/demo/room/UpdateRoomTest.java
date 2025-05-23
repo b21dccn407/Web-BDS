@@ -39,22 +39,22 @@ public class UpdateRoomTest {
 
     @BeforeEach
     public void setUp() throws SQLException {
-        connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/bds", "root", "1234");
+        connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/jdbc_property_wejc_property_web", "root", "1234");
         connection.setAutoCommit(false);
 
         // Clear all data with delete = 0 from room
-        try (PreparedStatement ps = connection.prepareStatement("DELETE FROM bds.room WHERE `delete` = 0")) {
+        try (PreparedStatement ps = connection.prepareStatement("DELETE FROM jdbc_property_wejc_property_web.room WHERE `delete` = 0")) {
             ps.executeUpdate();
         }
 
         // Clear all data with id_property = 10022 from property
-        try (PreparedStatement ps = connection.prepareStatement("DELETE FROM bds.property WHERE id_property = ?")) {
+        try (PreparedStatement ps = connection.prepareStatement("DELETE FROM jdbc_property_wejc_property_web.property WHERE id_property = ?")) {
             ps.setInt(1, TEST_PROPERTY_ID);
             ps.executeUpdate();
         }
 
         // Insert test property
-        String insertPropertyQuery = "INSERT INTO bds.property (id_property, name, province, district, ward, detail_address, " +
+        String insertPropertyQuery = "INSERT INTO jdbc_property_wejc_property_web.property (id_property, name, province, district, ward, detail_address, " +
                 "legal_doc, surface_area, useable_area, width, length, flours, bedrooms, toilet, direction, price, price_type, " +
                 "status, note, id_user, created_at, updated_at, `delete`, created_by_staff, created_by_user, type) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
@@ -91,7 +91,7 @@ public class UpdateRoomTest {
         }
 
         // Insert test room
-        String insertRoomQuery = "INSERT INTO bds.room (id_room, name, id_property, `delete`, status, price, id_owner, area, bathroom, bedroom, kitchen, interior, balcony, max_people, created_at, updated_at, frequency) " +
+        String insertRoomQuery = "INSERT INTO jdbc_property_wejc_property_web.room (id_room, name, id_property, `delete`, status, price, id_owner, area, bathroom, bedroom, kitchen, interior, balcony, max_people, created_at, updated_at, frequency) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement ps = connection.prepareStatement(insertRoomQuery)) {
             ps.setInt(1, TEST_ROOM_ID);
@@ -154,7 +154,7 @@ public class UpdateRoomTest {
         assertEquals("Room updated successfully!", responseBody.get("message"), "Message should match");
 
         // Verify updated data
-        try (PreparedStatement ps = connection.prepareStatement("SELECT name, area, bathroom, bedroom, kitchen, interior, balcony, status, max_people, id_property, price, frequency FROM bds.room WHERE id_room = ?")) {
+        try (PreparedStatement ps = connection.prepareStatement("SELECT name, area, bathroom, bedroom, kitchen, interior, balcony, status, max_people, id_property, price, frequency FROM jdbc_property_wejc_property_web.room WHERE id_room = ?")) {
             ps.setInt(1, TEST_ROOM_ID);
             try (ResultSet rs = ps.executeQuery()) {
                 assertTrue(rs.next(), "Room should exist");

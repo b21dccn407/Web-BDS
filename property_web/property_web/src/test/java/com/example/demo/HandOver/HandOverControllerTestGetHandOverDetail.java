@@ -46,17 +46,17 @@ public class HandOverControllerTestGetHandOverDetail {
      */
     @BeforeEach
     public void setUp() throws SQLException {
-        connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/bds", "root", "1234");
+        connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/web_nhadat", "root", "1234");
         connection.setAutoCommit(false);
 
         // Xóa dữ liệu cũ
-        try (PreparedStatement ps = connection.prepareStatement("DELETE FROM bds.hand_over WHERE id_owner = ?")) {
+        try (PreparedStatement ps = connection.prepareStatement("DELETE FROM web_nhadat.hand_over WHERE id_owner = ?")) {
             ps.setInt(1, TEST_OWNER_ID);
             ps.executeUpdate();
         }
 
         // Chèn bàn giao thử nghiệm
-        String insertQuery = "INSERT INTO bds.hand_over (label, id_contract, id_property, property_name, id_room, room_code, id_owner, tenants, date, content, created_date, updated_date, `delete`) " +
+        String insertQuery = "INSERT INTO web_nhadat.hand_over (label, id_contract, id_property, property_name, id_room, room_code, id_owner, tenants, date, content, created_date, updated_date, `delete`) " +
                             "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement ps = connection.prepareStatement(insertQuery, PreparedStatement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, "Test HandOver");
@@ -87,7 +87,7 @@ public class HandOverControllerTestGetHandOverDetail {
      */
     @AfterEach
     public void tearDown() throws SQLException {
-        try (PreparedStatement ps = connection.prepareStatement("DELETE FROM bds.hand_over WHERE id_owner = ?")) {
+        try (PreparedStatement ps = connection.prepareStatement("DELETE FROM web_nhadat.hand_over WHERE id_owner = ?")) {
             ps.setInt(1, TEST_OWNER_ID);
             ps.executeUpdate();
         }
@@ -145,7 +145,7 @@ public class HandOverControllerTestGetHandOverDetail {
     @Test
     public void testGetHandOverDetail_InvalidJson() {
         try {
-            try (PreparedStatement ps = connection.prepareStatement("UPDATE bds.hand_over SET tenants = ? WHERE id_hand_over = ?")) {
+            try (PreparedStatement ps = connection.prepareStatement("UPDATE web_nhadat.hand_over SET tenants = ? WHERE id_hand_over = ?")) {
                 ps.setString(1, "{\"invalid_field\":123}");
                 ps.setInt(2, testHandOverId);
                 ps.executeUpdate();

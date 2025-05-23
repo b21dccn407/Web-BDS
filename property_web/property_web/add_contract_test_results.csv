@@ -1,0 +1,2 @@
+Mã testcase,Tên File / Folder,Tên hàm,M?c tiêu Testcase,D? li?u ??u vào,K?t qu? mong mu?n ??u ra,K?t qu? th?c t?,K?t qu?,Ghi chú
+CON_ADD01,Contract/ContractController,addContract,Ki?m tra thêm thành công m?t b?n ghi contract v?i d? li?u h?p l?,Contract: prop_owner_id=9999, prop_name="New Property",HTTP Status: 201 CREATED. Response: message="Contract added successfully",,PASSED,

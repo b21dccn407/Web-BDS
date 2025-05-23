@@ -45,17 +45,17 @@ public class HandOverControllerTestUpdateHandOver {
      */
     @BeforeEach
     public void setUp() throws SQLException {
-        connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/bds", "root", "1234");
+        connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/web_nhadat", "root", "1234");
         connection.setAutoCommit(false);
 
         // Xóa dữ liệu cũ
-        try (PreparedStatement ps = connection.prepareStatement("DELETE FROM bds.hand_over WHERE id_owner = ?")) {
+        try (PreparedStatement ps = connection.prepareStatement("DELETE FROM web_nhadat.hand_over WHERE id_owner = ?")) {
             ps.setInt(1, TEST_OWNER_ID);
             ps.executeUpdate();
         }
 
         // Chèn bàn giao thử nghiệm
-        String insertQuery = "INSERT INTO bds.hand_over (label, id_contract, id_property, property_name, id_room, room_code, id_owner, tenants, date, content, created_date, updated_date, `delete`) " +
+        String insertQuery = "INSERT INTO web_nhadat.hand_over (label, id_contract, id_property, property_name, id_room, room_code, id_owner, tenants, date, content, created_date, updated_date, `delete`) " +
                             "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement ps = connection.prepareStatement(insertQuery, PreparedStatement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, "Test HandOver");
@@ -86,7 +86,7 @@ public class HandOverControllerTestUpdateHandOver {
      */
     @AfterEach
     public void tearDown() throws SQLException {
-        try (PreparedStatement ps = connection.prepareStatement("DELETE FROM bds.hand_over WHERE id_owner = ?")) {
+        try (PreparedStatement ps = connection.prepareStatement("DELETE FROM web_nhadat.hand_over WHERE id_owner = ?")) {
             ps.setInt(1, TEST_OWNER_ID);
             ps.executeUpdate();
         }
@@ -126,7 +126,7 @@ public class HandOverControllerTestUpdateHandOver {
         assertEquals("Hand over updated successfully hihihi!", responseBody.get("message"));
 
         // Kiểm tra cơ sở dữ liệu
-        try (PreparedStatement ps = connection.prepareStatement("SELECT * FROM bds.hand_over WHERE id_hand_over = ?")) {
+        try (PreparedStatement ps = connection.prepareStatement("SELECT * FROM web_nhadat.hand_over WHERE id_hand_over = ?")) {
             ps.setInt(1, testHandOverId);
             try (ResultSet rs = ps.executeQuery()) {
                 assertTrue(rs.next());

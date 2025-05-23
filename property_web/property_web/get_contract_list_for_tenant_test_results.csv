@@ -1,0 +1,3 @@
+Mã testcase,Tên File / Folder,Tên hàm,M?c tiêu Testcase,D? li?u ??u vào,K?t qu? mong mu?n ??u ra,K?t qu? th?c t?,K?t qu?,Ghi chú
+CON_TENANT_GET03,Contract/ContractController,getContractListForTenant,Ki?m tra l?y danh sách v?i username r?ng,username="",HTTP Status: 400 BAD_REQUEST. Response: Không tr? List<Contract>,,PASSED,
+CON_TENANT_GET02,Contract/ContractController,getContractListForTenant,Ki?m tra l?y danh sách v?i username không t?n t?i,username="nonexistent",HTTP Status: 200 OK. Response: List<Contract> r?ng,,PASSED,

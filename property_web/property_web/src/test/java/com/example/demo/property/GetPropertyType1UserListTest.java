@@ -1,17 +1,8 @@
 package com.example.demo.Property;
 
-import java.sql.Connection;
-import java.sql.Date;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.List;
-
+import com.example.demo.Model.Property;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,10 +10,19 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
 
-import com.example.demo.Model.Property;
-@Transactional
+import java.io.FileWriter;
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.Date;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
+
 @SpringBootTest
 @ActiveProfiles("test")
 public class GetPropertyType1UserListTest {
@@ -31,68 +31,87 @@ public class GetPropertyType1UserListTest {
     private PropertyController propertyController;
 
     private Connection connection;
-    private static final int TEST_USER_ID = 33;
-    private static final int TEST_PROPERTY_ID = 10020;
+    private static final int TEST_USER_ID = 9999;
+    private static final List<String[]> testResults = new ArrayList<>();
+    private static final String CSV_FILE = "get_property_type1_user_list_test_results.csv";
 
     @BeforeEach
     public void setUp() throws SQLException {
         connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/bds", "root", "1234");
         connection.setAutoCommit(false);
 
-        // Clear all data with delete = 0 from room
-        try (PreparedStatement ps = connection.prepareStatement("DELETE FROM bds.room WHERE `delete` = 0")) {
+        // Clear related data in room and property
+        try (PreparedStatement ps = connection.prepareStatement("DELETE FROM bds.room WHERE id_property IN (SELECT id_property FROM bds.property WHERE id_user = ?)")) {
+            ps.setInt(1, TEST_USER_ID);
+            ps.executeUpdate();
+        }
+        try (PreparedStatement ps = connection.prepareStatement("DELETE FROM bds.property WHERE id_user = ?")) {
+            ps.setInt(1, TEST_USER_ID);
             ps.executeUpdate();
         }
 
-        // Clear all data with delete = 0 from property
-        try (PreparedStatement ps = connection.prepareStatement("DELETE FROM bds.property WHERE `delete` = 0")) {
-            ps.executeUpdate();
-        }
-
-        // Insert test property with type = 1
-        String insertPropertyQuery = "INSERT INTO bds.property (id_property, name, province, district, ward, detail_address, " +
-                "legal_doc, surface_area, useable_area, width, length, flours, bedrooms, toilet, direction, price, price_type, " +
-                "status, note, id_user, created_at, updated_at, `delete`, created_by_staff, created_by_user, type) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        try (PreparedStatement ps = connection.prepareStatement(insertPropertyQuery)) {
-            ps.setInt(1, TEST_PROPERTY_ID);
-            ps.setString(2, "Test Property");
-            ps.setString(3, "Hanoi");
-            ps.setString(4, "Cau Giay");
-            ps.setString(5, "Dich Vong");
-            ps.setString(6, "123 Street");
-            ps.setString(7, "[]"); // Empty JSON array for legal_doc
-            ps.setFloat(8, 100.0f);
-            ps.setFloat(9, 80.0f);
+        // Insert test data (delete = 0, type = 1)
+        String insertQuery = "INSERT INTO bds.property (name, province, district, ward, detail_address, legal_doc, surface_area, useable_area, width, length, flours, bedrooms, toilet, direction, price, price_type, type, status, id_user, created_at, updated_at, created_by_staff, created_by_user, note, `delete`) " +
+                            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        try (PreparedStatement ps = connection.prepareStatement(insertQuery)) {
+            ps.setString(1, "Test Property Type 1");
+            ps.setString(2, "Hanoi");
+            ps.setString(3, "Cau Giay");
+            ps.setString(4, "Dich Vong");
+            ps.setString(5, "123 Street");
+            ps.setString(6, "[]");
+            ps.setFloat(7, 100.0f);
+            ps.setFloat(8, 80.0f);
+            ps.setFloat(9, 10.0f);
             ps.setFloat(10, 10.0f);
-            ps.setFloat(11, 10.0f);
-            ps.setInt(12, 2);
-            ps.setInt(13, 3);
-            ps.setInt(14, 2);
-            ps.setString(15, "[]"); // Empty JSON array for direction
-            ps.setFloat(16, 1000000.0f);
-            ps.setInt(17, 1);
+            ps.setInt(11, 2);
+            ps.setInt(12, 3);
+            ps.setInt(13, 2);
+            ps.setString(14, "[]");
+            ps.setFloat(15, 5000.0f);
+            ps.setInt(16, 1);
+            ps.setInt(17, 1); // type = 1
             ps.setInt(18, 1);
-            ps.setString(19, "Test note");
-            ps.setInt(20, TEST_USER_ID);
-            ps.setDate(21, Date.valueOf("2025-05-21"));
-            ps.setDate(22, Date.valueOf("2025-05-21"));
-            ps.setInt(23, 0);
-            ps.setInt(24, 0);
-            ps.setInt(25, TEST_USER_ID);
-            ps.setInt(26, 1); // type = 1
-
+            ps.setInt(19, TEST_USER_ID);
+            ps.setDate(20, Date.valueOf("2025-05-23"));
+            ps.setDate(21, Date.valueOf("2025-05-23"));
+            ps.setInt(22, 0);
+            ps.setInt(23, TEST_USER_ID);
+            ps.setString(24, "Test note");
+            ps.setInt(25, 0);
             int rows = ps.executeUpdate();
-            assertEquals(1, rows, "Failed to insert test property");
+            assertEquals(1, rows, "Failed to insert test property (delete = 0, type = 1)");
         }
 
-        // Verify inserted data
-        try (PreparedStatement ps = connection.prepareStatement("SELECT id_user FROM bds.property WHERE id_property = ?")) {
-            ps.setInt(1, TEST_PROPERTY_ID);
-            try (ResultSet rs = ps.executeQuery()) {
-                assertTrue(rs.next(), "Property should exist");
-                assertEquals(TEST_USER_ID, rs.getInt("id_user"), "Inserted id_user should match");
-            }
+        // Insert test data (delete = 0, type = 2)
+        try (PreparedStatement ps = connection.prepareStatement(insertQuery)) {
+            ps.setString(1, "Test Property Type 2");
+            ps.setString(2, "Hanoi");
+            ps.setString(3, "Cau Giay");
+            ps.setString(4, "Dich Vong");
+            ps.setString(5, "456 Street");
+            ps.setString(6, "[]");
+            ps.setFloat(7, 120.0f);
+            ps.setFloat(8, 100.0f);
+            ps.setFloat(9, 12.0f);
+            ps.setFloat(10, 10.0f);
+            ps.setInt(11, 3);
+            ps.setInt(12, 4);
+            ps.setInt(13, 3);
+            ps.setString(14, "[]");
+            ps.setFloat(15, 6000.0f);
+            ps.setInt(16, 1);
+            ps.setInt(17, 2); // type = 2
+            ps.setInt(18, 1);
+            ps.setInt(19, TEST_USER_ID);
+            ps.setDate(20, Date.valueOf("2025-05-23"));
+            ps.setDate(21, Date.valueOf("2025-05-23"));
+            ps.setInt(22, 0);
+            ps.setInt(23, TEST_USER_ID);
+            ps.setString(24, "Test note");
+            ps.setInt(25, 0);
+            int rows = ps.executeUpdate();
+            assertEquals(1, rows, "Failed to insert test property (delete = 0, type = 2)");
         }
 
         connection.commit();
@@ -100,12 +119,12 @@ public class GetPropertyType1UserListTest {
 
     @AfterEach
     public void tearDown() throws SQLException {
-        try (PreparedStatement ps = connection.prepareStatement("DELETE FROM bds.room WHERE id_property = ?")) {
-            ps.setInt(1, TEST_PROPERTY_ID);
+        try (PreparedStatement ps = connection.prepareStatement("DELETE FROM bds.room WHERE id_property IN (SELECT id_property FROM bds.property WHERE id_user = ?)")) {
+            ps.setInt(1, TEST_USER_ID);
             ps.executeUpdate();
         }
-        try (PreparedStatement ps = connection.prepareStatement("DELETE FROM bds.property WHERE id_property = ?")) {
-            ps.setInt(1, TEST_PROPERTY_ID);
+        try (PreparedStatement ps = connection.prepareStatement("DELETE FROM bds.property WHERE id_user = ?")) {
+            ps.setInt(1, TEST_USER_ID);
             ps.executeUpdate();
         }
         if (connection != null && !connection.isClosed()) {
@@ -113,54 +132,108 @@ public class GetPropertyType1UserListTest {
         }
     }
 
+    @AfterAll
+    static void saveTestResultsToCsv() throws IOException {
+        try (FileWriter writer = new FileWriter(CSV_FILE)) {
+            writer.append("Mã testcase,Tên File / Folder,Tên hàm,Mục tiêu Testcase,Dữ liệu đầu vào,Kết quả mong muốn đầu ra,Kết quả thực tế,Kết quả,Ghi chú\n");
+            for (String[] result : testResults) {
+                writer.append(String.join(",", result)).append("\n");
+            }
+        }
+    }
+
     @Test
     public void testGetPropertyType1UserList_Success() {
-        // Arrange
-        String idUser = String.valueOf(TEST_USER_ID);
+        String result = "PASSED";
+        String message = "";
+        String testCaseId = "PROP_TYPE1_GET01";
 
-        // Act
-        ResponseEntity<List<Property>> response = propertyController.getPropertyType1UserList(idUser);
-
-        // Assert
-        assertEquals(HttpStatus.OK, response.getStatusCode(), "HTTP status should be OK");
-        List<Property> properties = response.getBody();
-        assertNotNull(properties, "Property list should not be null");
-        assertEquals(1, properties.size(), "Property list should contain one property");
-        Property property = properties.get(0);
-        assertEquals("Test Property", property.getName(), "Name should match");
-        assertEquals("Hanoi", property.getProvince(), "Province should match");
-        assertEquals(TEST_PROPERTY_ID, property.getId_property(), "Property ID should match");
-        assertEquals(TEST_USER_ID, property.getId_user(), "User ID should match");
-        assertEquals(1, property.getType(), "Type should be 1");
+        try {
+            ResponseEntity<List<Property>> response = propertyController.getPropertyType1UserList(String.valueOf(TEST_USER_ID));
+            assertEquals(HttpStatus.OK, response.getStatusCode(), "HTTP status should be OK");
+            List<Property> properties = response.getBody();
+            assertNotNull(properties, "Property list should not be null");
+            assertEquals(1, properties.size(), "Property list should contain one property (type = 1)");
+            Property property = properties.get(0);
+            assertEquals("Test Property Type 1", property.getName(), "Property name should match");
+            assertEquals(1, property.getType(), "Property type should be 1");
+        } catch (Exception e) {
+            result = "FAILED";
+            message = e.getMessage();
+        }
+        testResults.add(new String[]{testCaseId, "Property/PropertyController", "getPropertyType1UserList",
+                "Kiểm tra lấy danh sách property type=1 thành công với id_user hợp lệ",
+                "id_user=" + TEST_USER_ID,
+                "HTTP Status: 200 OK. Response: List<Property> không rỗng, chứa bản ghi với type=1, id_user=" + TEST_USER_ID,
+                message, result, ""});
     }
 
     @Test
-    public void testGetPropertyType1UserList_NoDataFound() {
-        // Arrange
-        String idUser = String.valueOf(TEST_USER_ID + 1); // Non-existent user ID
+    public void testGetPropertyType1UserList_NoData() {
+        String result = "PASSED";
+        String message = "";
+        String testCaseId = "PROP_TYPE1_GET02";
 
-        // Act
-        ResponseEntity<List<Property>> response = propertyController.getPropertyType1UserList(idUser);
-
-        // Assert
-        assertEquals(HttpStatus.OK, response.getStatusCode(), "HTTP status should be OK");
-        List<Property> properties = response.getBody();
-        assertNotNull(properties, "Property list should not be null");
-        assertTrue(properties.isEmpty(), "Property list should be empty for non-existent user");
+        try {
+            ResponseEntity<List<Property>> response = propertyController.getPropertyType1UserList("999");
+            assertEquals(HttpStatus.OK, response.getStatusCode(), "HTTP status should be OK");
+            List<Property> properties = response.getBody();
+            assertNotNull(properties, "Property list should not be null");
+            assertTrue(properties.isEmpty(), "Property list should be empty");
+        } catch (Exception e) {
+            result = "FAILED";
+            message = e.getMessage();
+        }
+        testResults.add(new String[]{testCaseId, "Property/PropertyController", "getPropertyType1UserList",
+                "Kiểm tra lấy danh sách với id_user không tồn tại",
+                "id_user=999",
+                "HTTP Status: 200 OK. Response: List<Property> rỗng",
+                message, result, ""});
     }
 
     @Test
-    public void testGetPropertyType1UserList_InvalidUserId() {
-        // Arrange
-        String idUser = "invalid"; // Non-numeric user ID
+    public void testGetPropertyType1UserList_InvalidIdUser() {
+        String result = "PASSED";
+        String message = "";
+        String testCaseId = "PROP_TYPE1_GET03";
 
-        // Act
-        ResponseEntity<List<Property>> response = propertyController.getPropertyType1UserList(idUser);
+        try {
+            ResponseEntity<List<Property>> response = propertyController.getPropertyType1UserList("abc");
+            assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode(), "HTTP status should be BAD_REQUEST");
+            List<Property> properties = response.getBody();
+            assertNotNull(properties, "Property list should not be null");
+            assertTrue(properties.isEmpty(), "Property list should be empty");
+        } catch (Exception e) {
+            result = "FAILED";
+            message = e.getMessage();
+        }
+        testResults.add(new String[]{testCaseId, "Property/PropertyController", "getPropertyType1UserList",
+                "Kiểm tra lấy danh sách với id_user không phải số",
+                "id_user=\"abc\"",
+                "HTTP Status: 400 BAD_REQUEST. Response: List<Property> rỗng",
+                message, result, ""});
+    }
 
-        // Assert
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode(), "HTTP status should be BAD_REQUEST for invalid user ID");
-        List<Property> properties = response.getBody();
-        assertNotNull(properties, "Property list should not be null");
-        assertTrue(properties.isEmpty(), "Property list should be empty for invalid user ID");
+    @Test
+    public void testGetPropertyType1UserList_EmptyIdUser() {
+        String result = "PASSED";
+        String message = "";
+        String testCaseId = "PROP_TYPE1_GET04";
+
+        try {
+            ResponseEntity<List<Property>> response = propertyController.getPropertyType1UserList("");
+            assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode(), "HTTP status should be BAD_REQUEST");
+            List<Property> properties = response.getBody();
+            assertNotNull(properties, "Property list should not be null");
+            assertTrue(properties.isEmpty(), "Property list should be empty");
+        } catch (Exception e) {
+            result = "FAILED";
+            message = e.getMessage();
+        }
+        testResults.add(new String[]{testCaseId, "Property/PropertyController", "getPropertyType1UserList",
+                "Kiểm tra lấy danh sách với id_user rỗng",
+                "id_user=\"\"",
+                "HTTP Status: 400 BAD_REQUEST. Response: List<Property> rỗng",
+                message, result, ""});
     }
 }

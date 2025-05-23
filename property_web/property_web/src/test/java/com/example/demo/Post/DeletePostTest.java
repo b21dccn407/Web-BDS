@@ -39,17 +39,17 @@ public class DeletePostTest {
 
     @BeforeEach
     public void setUp() throws SQLException {
-        connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/bds", "root", "1234");
+        connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/web_nhadat", "root", "1234");
         connection.setAutoCommit(false);
 
         // Clear existing data
-        try (PreparedStatement ps = connection.prepareStatement("DELETE FROM bds.post WHERE id_property = ?")) {
+        try (PreparedStatement ps = connection.prepareStatement("DELETE FROM web_nhadat.post WHERE id_property = ?")) {
             ps.setInt(1, TEST_PROPERTY_ID);
             ps.executeUpdate();
         }
 
         // Insert test data
-        String insertQuery = "INSERT INTO bds.post (header, province, district, ward, detail_address, " +
+        String insertQuery = "INSERT INTO web_nhadat.post (header, province, district, ward, detail_address, " +
                 "surface_area, useable_area, width, length, flours, bedrooms, toilets, status, short_description, " +
                 "detail_des, created_by_user, type, owner, phone_number, email, company_name, exp_date, created_at, " +
                 "updated_at, `delete`, id_property, public_price, electric, water, water_type, internet, clean, elevator, " +
@@ -112,7 +112,7 @@ public class DeletePostTest {
 
     @AfterEach
     public void tearDown() throws SQLException {
-        try (PreparedStatement ps = connection.prepareStatement("DELETE FROM bds.post WHERE id_property = ?")) {
+        try (PreparedStatement ps = connection.prepareStatement("DELETE FROM web_nhadat.post WHERE id_property = ?")) {
             ps.setInt(1, TEST_PROPERTY_ID);
             ps.executeUpdate();
         }
@@ -138,7 +138,7 @@ public class DeletePostTest {
 
         // Verify data in database
         try (PreparedStatement ps = connection.prepareStatement(
-                "SELECT `delete` FROM bds.post WHERE id_post = ?")) {
+                "SELECT `delete` FROM web_nhadat.post WHERE id_post = ?")) {
             ps.setInt(1, testPostId);
             try (ResultSet rs = ps.executeQuery()) {
                 assertTrue(rs.next(), "Post should exist in database");
@@ -166,7 +166,7 @@ public class DeletePostTest {
 
         // Verify data in database (original post unchanged)
         try (PreparedStatement ps = connection.prepareStatement(
-                "SELECT `delete` FROM bds.post WHERE id_post = ?")) {
+                "SELECT `delete` FROM web_nhadat.post WHERE id_post = ?")) {
             ps.setInt(1, testPostId);
             try (ResultSet rs = ps.executeQuery()) {
                 assertTrue(rs.next(), "Original post should still exist");
@@ -194,7 +194,7 @@ public class DeletePostTest {
 
         // Verify data in database (original post unchanged)
         try (PreparedStatement ps = connection.prepareStatement(
-                "SELECT `delete` FROM bds.post WHERE id_post = ?")) {
+                "SELECT `delete` FROM web_nhadat.post WHERE id_post = ?")) {
             ps.setInt(1, testPostId);
             try (ResultSet rs = ps.executeQuery()) {
                 assertTrue(rs.next(), "Original post should still exist");

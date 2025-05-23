@@ -39,21 +39,21 @@ public class GetSuggestListTest {
 
     @BeforeEach
     public void setUp() throws SQLException {
-        connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/bds", "root", "1234");
+        connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/web_nhadat", "root", "1234");
         connection.setAutoCommit(false);
 
         // Clear existing data
-        try (PreparedStatement ps = connection.prepareStatement("DELETE FROM bds.post WHERE id_property = ?")) {
+        try (PreparedStatement ps = connection.prepareStatement("DELETE FROM web_nhadat.post WHERE id_property = ?")) {
             ps.setInt(1, TEST_PROPERTY_ID);
             ps.executeUpdate();
         }
-        try (PreparedStatement ps = connection.prepareStatement("DELETE FROM bds.suggest_form WHERE id_tenant = ?")) {
+        try (PreparedStatement ps = connection.prepareStatement("DELETE FROM web_nhadat.suggest_form WHERE id_tenant = ?")) {
             ps.setInt(1, TEST_TENANT_ID);
             ps.executeUpdate();
         }
 
         // Insert test data into suggest_form
-        String insertSuggestQuery = "INSERT INTO bds.suggest_form (id_tenant, province, district, ward, detail_address) " +
+        String insertSuggestQuery = "INSERT INTO web_nhadat.suggest_form (id_tenant, province, district, ward, detail_address) " +
                 "VALUES (?, ?, ?, ?, ?)";
         try (PreparedStatement ps = connection.prepareStatement(insertSuggestQuery)) {
             ps.setInt(1, TEST_TENANT_ID);
@@ -66,7 +66,7 @@ public class GetSuggestListTest {
         }
 
         // Insert test data into post
-        String insertPostQuery = "INSERT INTO bds.post (header, province, district, ward, detail_address, " +
+        String insertPostQuery = "INSERT INTO web_nhadat.post (header, province, district, ward, detail_address, " +
                 "surface_area, useable_area, width, length, flours, bedrooms, toilets, status, short_description, " +
                 "detail_des, created_by_user, type, owner, phone_number, email, company_name, exp_date, created_at, " +
                 "updated_at, `delete`, id_property, public_price, electric, water, water_type, internet, clean, elevator, " +
@@ -119,11 +119,11 @@ public class GetSuggestListTest {
 
     @AfterEach
     public void tearDown() throws SQLException {
-        try (PreparedStatement ps = connection.prepareStatement("DELETE FROM bds.post WHERE id_property = ?")) {
+        try (PreparedStatement ps = connection.prepareStatement("DELETE FROM web_nhadat.post WHERE id_property = ?")) {
             ps.setInt(1, TEST_PROPERTY_ID);
             ps.executeUpdate();
         }
-        try (PreparedStatement ps = connection.prepareStatement("DELETE FROM bds.suggest_form WHERE id_tenant = ?")) {
+        try (PreparedStatement ps = connection.prepareStatement("DELETE FROM web_nhadat.suggest_form WHERE id_tenant = ?")) {
             ps.setInt(1, TEST_TENANT_ID);
             ps.executeUpdate();
         }
@@ -168,7 +168,7 @@ public class GetSuggestListTest {
 
         // Verify no changes in database
         try (PreparedStatement ps = connection.prepareStatement(
-                "SELECT * FROM bds.post WHERE id_property = ?")) {
+                "SELECT * FROM web_nhadat.post WHERE id_property = ?")) {
             ps.setInt(1, TEST_PROPERTY_ID);
             try (ResultSet rs = ps.executeQuery()) {
                 assertTrue(rs.next(), "Original post should still exist");
@@ -195,7 +195,7 @@ public class GetSuggestListTest {
 
         // Verify no changes in database
         try (PreparedStatement ps = connection.prepareStatement(
-                "SELECT * FROM bds.post WHERE id_property = ?")) {
+                "SELECT * FROM web_nhadat.post WHERE id_property = ?")) {
             ps.setInt(1, TEST_PROPERTY_ID);
             try (ResultSet rs = ps.executeQuery()) {
                 assertTrue(rs.next(), "Original post should still exist");
